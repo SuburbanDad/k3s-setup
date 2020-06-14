@@ -1,0 +1,10 @@
+# Crappy and manual for first iteration
+FROM ubuntu:18.04
+ENV DATA_DIR /eth2/ 
+#RUN ./prysm.sh beacon-chain --download-only
+RUN mkdir -p /prysm/bin
+ADD ./dist/beacon-chain-v1.0.0-alpha.11-linux-arm64 /prysm/bin/beacon-chain 
+RUN apt update && apt-get install ca-certificates -y
+
+
+ENTRYPOINT ["/prysm/bin/beacon-chain"]
