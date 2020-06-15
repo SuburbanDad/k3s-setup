@@ -16,20 +16,19 @@ on kernels >5.3.0 it is safe to ignore these two errors:
 	- CONFIG_NF_NAT_NEEDED: missing (fail)
 
 
-
 on master node:
 ----------------
-curl -sfL https://get.k3s.io | sh -
+`curl -sfL https://get.k3s.io | sh -`
 
 
 save yourself a shitton of annoyance and add pi to root group.  now no more sudo to interact with k3s:
 	`sudo usermod -a -G root p`
-	`chmod 660 /etc/rancher/k3s/k3s.yaml`
+	`sudo chmod 660 /etc/rancher/k3s/k3s.yaml`
 
 
 
 once settled, get node TOKEN:
-	cat /var/lib/rancher/k3s/server/node-token
+	`sudo cat /var/lib/rancher/k3s/server/node-token`
 
 
 
@@ -43,38 +42,57 @@ once settled, get node TOKEN:
 
 on worker nodes:
 ----------------
-	`curl -sfL https://get.k3s.io | K3S_URL=https://pi1.home:6443 K3S_TOKEN=NODE_TOKEN_VALUE_FROM_ABOVE_GOES_HERE sh -`
+    export NODE_TOKEN="whatever node token"
+	`curl -sfL https://get.k3s.io | K3S_URL=https://pi1.home:6443 K3S_TOKEN=$NODE_TOKEN sh -`
 
 
 
 
 installing k8s dashboard:
 -------------------------
-
-
 https://rancher.com/docs/k3s/latest/en/installation/kube-dashboard/
 
+* zsh is not happy with the VERSION_KUBE_DASHBOARD envar set here, use bash:
+	```
+		GITHUB_URL=https://github.com/kubernetes/dashboard/releases
+		VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
+		sudo k3s kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
+	```
+* from dash/ :
+	`sudo k3s kubectl create -f dashboard.admin-user.yaml -f dashboard.admin-user-role.yaml`
+
+* get token:
+  `sudo k3s kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token`
 
 
 setup helm3:
 ------------
-`curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -`
+	`curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -`
 
-`helm repo add stable https://kubernetes-charts.storage.googleapis.com/`
+	`helm repo add stable https://kubernetes-charts.storage.googleapis.com/`
 
-`helm repo update`
+	`helm repo update`
 
 run this and/or add this to your shell profile:
-`export KUBECONFIG=/etc/rancher/k3s/k3s.yaml`
+	`export KUBECONFIG=/etc/rancher/k3s/k3s.yaml`
+
 
 install prometheus:
 -------------------
-`helm install prometheus stable/prometheus --set carlosedp/kube-state-metrics:1.9.5`
+* use an arm64 friendly kube-state-metrics:
 
+	`helm install prometheus stable/prometheus --set kube-state-metrics.image.repository=carlosedp/kube-state-metrics`
+
+* maybe should create this image in suburbandad repo to ensure its existence and evolution
 
 install grafana:
 ----------------
-helm install grafana stable/grafana --set sidecar.datasources.enabled=true --set sidecar.datasources.label=grafana_datasource --set persistence.enabled=true
+* if you want autodiscovery of sources, it is a pain in the ass since `kiwigrid/k8s-sidecar` only has amd64 builds, if you want to use this:
+	`helm install grafana stable/grafana --set sidecar.datasources.enabled=true --set persistence.enabled=true --set persistence.type=pvc --set persistence.size=500Mi`
+  you will have to manually edit the deployment and change the sidecar image to `suburbandad/k8s-sidecar:latest`   
+
+  otherwise, you will have to manually add prometheus data source to grafana after startup but can use this:
+    `helm install grafana stable/grafana --set persistence.enabled=true --set persistence.type=pvc --set persistence.size=500Mi`
 
 
 
@@ -101,7 +119,7 @@ k3s prysmatic helm chart
 
 
 
-Juse 15, 2020
+June 15, 2020
 TODO:
 left off with grafana and prometheus, trying to get the helm chart pods to automatically get their metrics endpoints scraped
   * maybe needs a service ?
