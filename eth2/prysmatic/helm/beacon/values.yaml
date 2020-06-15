@@ -1,0 +1,4 @@
+image:
+  name: suburbandad/prysmatic-beacon
+  tag: latest
+  pullPolicy: Always
