@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prysm-beacon
+  labels:
+    app: prysm-beacon
+spec:
+  replicas: 2
+  serviceName: prysm-beacon
+  selector: 
+    matchLabels:
+      app: prysm-beacon
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+      labels:
+        app: prysm-beacon
+    spec:
+      containers:
+      - name: prysm-beacon
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 13000
+          name: p2p
+        - containerPort: 4000
+          name: rpc
+        args: ["--datadir","/data", "-dev"]
+        resources:
+          limits:
+            cpu: "4"
+            memory: 3500Mi
+          requests:
+            cpu: "2"
+            memory: 2Gi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - prysm-beacon
+              topologyKey: "kubernetes.io/hostname"
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 120Gi
