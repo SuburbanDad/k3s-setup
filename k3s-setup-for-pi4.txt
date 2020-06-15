@@ -85,6 +85,32 @@ copy the relevant bits from /etc/rancher/k3s/
 
 
 
+persistent volume config
+-------------------------
+https://rancher.com/docs/k3s/latest/en/storage/
+
+* rancher out of the box offers local storage
+* to use `local-path` persistence, we only have to define the claim.
+  ** not seeing a way to direct it to a specific node at creation
+  ** it seems to resolve as soon as the pod requests it
+  ** once there, it should always be there, and presumably impacts pod scheduling
+*** net/net, deployment and/or pod definitions should implicitly place the PVCs whereever the pods
+    get scheduled at first (which node).  For the example/POC, we make sure the CPU request is
+    high enough that it forces the pods to land of different hosts. 
+*** TODO: a better way to do this would be with pod anti-node affinity.   
+* see POC defs of 3 data PVs and beacon test pods 
+  /persistence/
+    pvc.yaml
+    beacon-test-pods.yaml
+* persistent volume resources in k8s have the node's hostpath in (Source -> hostPath)
+ e.g. `/var/lib/rancher/k3s/storage/pvc-dbd53af7-4729-45ea-9d50-f5e1230d23ee`
+* it isn't cl
+
+
+
+
+
+
 
 
 
