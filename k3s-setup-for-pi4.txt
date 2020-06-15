@@ -84,15 +84,40 @@ getting the config setup on remote machine:
 copy the relevant bits from /etc/rancher/k3s/
 
 
+setup ingress:
+--------------
+* k3s uses traefik, lean and easy
+* for grafana ingress see ingress/grafana.yaml
+
 
 k3s prysmatic helm chart
 -------------------------
 * StatefulSet
 * using volumeClaimTemplates 
 * using node anti-affinity
+* from beacon dir, run `helm install prysm-beacon .
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+research/testing/troubleshooting:
+-------------------------------------
 
 
 
@@ -111,14 +136,13 @@ https://rancher.com/docs/k3s/latest/en/storage/
 *** net/net, deployment and/or pod definitions should implicitly place the PVCs whereever the pods
     get scheduled at first (which node).  For the example/POC, we make sure the CPU request is
     high enough that it forces the pods to land of different hosts. 
-*** TODO: a better way to do this would be with pod anti-node affinity.   
+*** TODO: a better way to do this would be with pod anti-node affinity and a statefulset with volumeClaimTemplates.
 * see POC defs of 3 data PVs and beacon test pods 
   /persistence/
     pvc.yaml
     beacon-test-pods.yaml
 * persistent volume resources in k8s have the node's hostpath in (Source -> hostPath)
  e.g. `/var/lib/rancher/k3s/storage/pvc-dbd53af7-4729-45ea-9d50-f5e1230d23ee`
-* it isn't cl
 
 
 

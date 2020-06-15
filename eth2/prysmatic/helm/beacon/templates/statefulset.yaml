@@ -30,7 +30,7 @@ spec:
           name: p2p
         - containerPort: 4000
           name: rpc
-        args: ["--datadir","/data"]
+        args: ["--datadir","/data", "-dev"]
         resources:
           limits:
             cpu: "4"
