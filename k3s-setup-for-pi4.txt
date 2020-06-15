@@ -74,12 +74,12 @@ install prometheus:
 
 install grafana:
 ----------------
-helm install grafana stable/grafana --set sidecar.datasources.enabled=true --set sidecar.datasources.label=grafana_datasource
+helm install grafana stable/grafana --set sidecar.datasources.enabled=true --set sidecar.datasources.label=grafana_datasource --set persistence.enabled=true
 
 
 
-getting the config setup on remote machine:
--------------------------------------------
+getting kube context setup on remote machine:
+----------------------------------------------
 
 copy the relevant bits from /etc/rancher/k3s/
 
@@ -101,8 +101,14 @@ k3s prysmatic helm chart
 
 
 
-
-
+Juse 15, 2020
+TODO:
+left off with grafana and prometheus, trying to get the helm chart pods to automatically get their metrics endpoints scraped
+  * maybe needs a service ?
+  * dropped grafana, when redeploying with persistence=true, it no longer wants to start and is unhappy. :shrug:
+* setup a service for statefulset pods
+* create and publish a validator image
+  * work on keys/secrets/etc for validator
 
 
 
