@@ -85,9 +85,23 @@ copy the relevant bits from /etc/rancher/k3s/
 
 
 
-persistent volume config
+k3s prysmatic helm chart
 -------------------------
-https://rancher.com/docs/k3s/latest/en/storage/
+* StatefulSet
+* using volumeClaimTemplates 
+* using node anti-affinity
+
+
+
+
+
+
+
+
+
+persistent volume testing
+-------------------------
+https://rancher.com/docs/k3s/latest/en/storage/
 
 * rancher out of the box offers local storage
 * to use `local-path` persistence, we only have to define the claim.
@@ -118,9 +132,10 @@ persistent volume config
 
 troubleshooting:
 ----------------
+    
 
-    problem starting server:
-    ------------------------
+    problem starting k3s server:
+    -----------------------------
     syslog showing a lot of:
 
 		Jun 12 00:02:12 pi1 k3s[6083]: time="2020-06-12T00:02:12.941783264-07:00" level=error msg="Failed to find memory cgroup, you may need to add \"cgroup_memory=1 cgroup_enable=memory\" to your linux cmdline (/boot/cmdline.txt on a Raspberry Pi)"
@@ -130,9 +145,12 @@ troubleshooting:
     sources indicate that raspbian should add three flags to cmdline.txt:  cgroup_enable=cpuset and cgroup_memory=1 cgroup_enable=memory
 
 
-    problems starting worker:
-    -------------------------
+    problems starting k3s agent/worker:
+    -----------------------------------
 	Jun 12 08:20:53 pi2 k3s[479]: time="2020-06-12T08:20:53.320014860-07:00" level=error msg="failed to get CA certs at https://127.0.0.1:36233/cacerts: Get https://127.0.0.1:36233/cacerts: read tcp 127.0.0.1:45818->127.0.0.1:36233: read: connection reset by peer"
 
 	for me this was a dns screwup.  agent was installed with an improper server hostname
 
+    debug host/node environment:
+    ----------------------------
+    `kubectl run debug2 -it --image ubuntu:18.04 -- bash`

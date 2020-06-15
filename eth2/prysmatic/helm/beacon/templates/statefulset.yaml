@@ -22,7 +22,7 @@ spec:
       containers:
       - name: prysm-beacon
         image: {{ .Values.image.name }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
         ports:
         - containerPort: 8080
           name: metrics
@@ -41,6 +41,16 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - prysm-beacon
+              topologyKey: "kubernetes.io/hostname"
   volumeClaimTemplates:
   - metadata:
       name: data
