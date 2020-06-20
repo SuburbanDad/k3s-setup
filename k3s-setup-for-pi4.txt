@@ -113,7 +113,8 @@ k3s prysmatic helm chart
 * StatefulSet
 * using volumeClaimTemplates 
 * using node anti-affinity
-* from beacon dir, run `helm install prysm-beacon .
+* from beacon dir, run 
+	`helm install prysm-beacon .`
 
 
 
