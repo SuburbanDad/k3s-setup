@@ -2,3 +2,5 @@ image:
   name: suburbandad/prysmatic-beacon
   tag: latest
   pullPolicy: Always
+service:
+  port: 4000

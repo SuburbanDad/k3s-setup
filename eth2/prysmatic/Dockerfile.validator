@@ -1,0 +1,9 @@
+# Crappy and manual for first iteration
+FROM ubuntu:18.04
+ENV DATA_DIR /eth2/ 
+RUN mkdir -p /prysm/bin
+ADD prysm.sh /prysm/bin
+RUN apt update && apt-get install ca-certificates curl libdigest-sha-perl gpg -y &&  rm -rf /var/lib/apt/lists/*
+RUN /prysm/bin/prysm.sh validator --download-only
+
+ENTRYPOINT ["/prysm/bin/prysm.sh", "validator"]
